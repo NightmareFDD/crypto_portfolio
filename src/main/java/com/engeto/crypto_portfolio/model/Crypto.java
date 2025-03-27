@@ -1,16 +1,18 @@
 package com.engeto.crypto_portfolio.model;
 
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString
 public class Crypto {
 
+    @EqualsAndHashCode.Include
     @NotNull(message = "ID must not be null")
     private Integer id;
 

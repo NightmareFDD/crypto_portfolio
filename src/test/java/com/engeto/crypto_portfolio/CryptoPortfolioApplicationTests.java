@@ -8,6 +8,7 @@ class CryptoPortfolioApplicationTests {
 
     @Test
     void contextLoads() {
+        // Its empty
     }
 
 }
