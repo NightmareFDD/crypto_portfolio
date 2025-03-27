@@ -37,18 +37,18 @@ class CryptoControllerTest {
     }
 
     @Test
-    void addCrypto_shouldReturn200() throws Exception {
+    void addCrypto_shouldReturn201() throws Exception {
         Crypto crypto = new Crypto(1, "BTC", "BTC", 50000, 0.1);
 
-        mockMvc.perform(post("/crypto")
+        mockMvc.perform(post("/cryptos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(crypto)))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
     }
 
     @Test
     void getAll_shouldReturnEmptyListInitially() throws Exception {
-        mockMvc.perform(get("/crypto"))
+        mockMvc.perform(get("/cryptos"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("[]"));
     }

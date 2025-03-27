@@ -38,6 +38,13 @@ public class CryptoController {
         return ResponseEntity.ok(cryptoService.getCryptoById(id));
     }
 
+    @GetMapping("/portfolio-value")
+    public ResponseEntity<String> getTotalValue() {
+        double value = cryptoService.getPortfolioValue();
+        log.info("Received request to calculate portfolio value. Result: {}", value);
+        return ResponseEntity.ok("Portfolio value: " + value + " $");
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateCrypto(@PathVariable Integer id, @RequestBody @Validated Crypto crypto) {
         log.info("Received request to update crypto ID {}: {}", id, crypto);
@@ -45,10 +52,4 @@ public class CryptoController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/portfolio-value")
-    public ResponseEntity<String> getTotalValue() {
-        double value = cryptoService.getPortfolioValue();
-        log.info("Received request to calculate portfolio value. Result: {}", value);
-        return ResponseEntity.ok("Portfolio value: " + value + " $");
-    }
 }

@@ -41,7 +41,7 @@ class CryptoControllerValidationTest {
     void addCrypto_shouldFailValidation_onBlankName() throws Exception {
         Crypto invalidCrypto = new Crypto(1, "", "BTC", 50000, 0.5);
 
-        mockMvc.perform(post("/crypto")
+        mockMvc.perform(post("/cryptos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidCrypto)))
                 .andExpect(status().isBadRequest())
@@ -52,7 +52,7 @@ class CryptoControllerValidationTest {
     void addCrypto_shouldFailValidation_onNegativePrice() throws Exception {
         Crypto invalidCrypto = new Crypto(2, "Ethereum", "ETH", -100, 2);
 
-        mockMvc.perform(post("/crypto")
+        mockMvc.perform(post("/cryptos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidCrypto)))
                 .andExpect(status().isBadRequest())
