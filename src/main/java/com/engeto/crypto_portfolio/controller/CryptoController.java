@@ -46,9 +46,9 @@ public class CryptoController {
     }
 
     @GetMapping("/portfolio-value")
-    public ResponseEntity<Double> getTotalValue() {
+    public ResponseEntity<String> getTotalValue() {
         double value = cryptoService.getPortfolioValue();
         log.info("Received request to calculate portfolio value. Result: {}", value);
-        return ResponseEntity.ok(value);
+        return ResponseEntity.ok("Portfolio value: " + value + " $");
     }
 }

@@ -17,10 +17,11 @@ public class CryptoServiceImplementation implements CryptoService {
     private final List<Crypto> portfolio = new ArrayList<>();
 
     private final Map<SortBy, Comparator<Crypto>> sortingMap = Map.of(
-            SortBy.NAME, Comparator.comparing(Crypto::getName, String.CASE_INSENSITIVE_ORDER),
+            SortBy.NAME, Comparator.comparing(Crypto::getName, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)),
             SortBy.PRICE, Comparator.comparingDouble(Crypto::getPrice),
             SortBy.QUANTITY, Comparator.comparingDouble(Crypto::getQuantity)
     );
+
 
     @Override
     public void addCrypto(Crypto crypto) {
@@ -31,18 +32,20 @@ public class CryptoServiceImplementation implements CryptoService {
 
     @Override
     public List<Crypto> getAllCryptos(String sortByRaw) {
-        Comparator<Crypto> comparator = sortingMap.get(SortBy.fromString(sortByRaw));
-        log.debug("Getting all cryptos, sort: {}, result size: {}", sortByRaw, portfolio.size());
+        if (sortByRaw != null && !sortByRaw.isBlank()) {
+            log.debug("Getting sorted portfolio by: {}", sortByRaw);
+            Comparator<Crypto> comparator = resolveComparator(sortByRaw);
+            return getSortedPortfolio(comparator);
+        }
 
-        return (comparator != null)
-                ? portfolio.stream().filter(Objects::nonNull).sorted(comparator).toList()
-                : List.copyOf(portfolio);
+        log.debug("Getting unsorted portfolio.");
+        return getUnsortedPortfolio();
     }
 
     @Override
     public Crypto getCryptoById(Integer id) {
-        return findCryptoById(id)
-                .orElseThrow(() -> new CryptoNotFoundException(id));
+        log.debug("Looking for crypto with ID: {}", id);
+        return findCryptoById(id).orElseThrow(() -> new CryptoNotFoundException(id));
     }
 
     @Override
@@ -55,15 +58,35 @@ public class CryptoServiceImplementation implements CryptoService {
 
     @Override
     public double getPortfolioValue() {
-        return portfolio.stream()
+        double total = portfolio.stream()
                 .filter(Objects::nonNull)
                 .mapToDouble(c -> c.getPrice() * c.getQuantity())
                 .sum();
+        log.debug("Calculated portfolio value: {}", total);
+        return total;
     }
 
+    @Override
     public void clearPortfolio() {
         portfolio.clear();
-        log.info("Portfolio cleared.");
+    }
+
+    private List<Crypto> getSortedPortfolio(Comparator<Crypto> comparator) {
+        return portfolio.stream()
+                .filter(Objects::nonNull)
+                .sorted(comparator)
+                .toList();
+    }
+
+    private List<Crypto> getUnsortedPortfolio() {
+        return portfolio.stream()
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    private Comparator<Crypto> resolveComparator(String sortByRaw) {
+        SortBy sortBy = SortBy.fromString(sortByRaw);
+        return sortingMap.getOrDefault(sortBy, Comparator.comparing(Crypto::getId));
     }
 
     private Optional<Crypto> findCryptoById(Integer id) {
